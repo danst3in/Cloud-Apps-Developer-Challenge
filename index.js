@@ -1,5 +1,5 @@
 const express = require("express");
-const { ApolloServer, gql } = require("apollo-server");
+const { ApolloServer, gql } = require("apollo-server-express");
 const { GraphQLScalarType } = require("graphql");
 const spacex_launches_data = require("./spacex_launches.json");
 
@@ -38,8 +38,7 @@ const typeDefs = gql`
   # query: Query
 
   type Query {
-    launches():[Launch]!
-
+    launches: [Launch]!
   }
 `;
 
