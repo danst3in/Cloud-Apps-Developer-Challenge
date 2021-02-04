@@ -36,4 +36,6 @@ type Query {
   missionName(mission_name: String!): Launch #Will return a Launch if it exists
   launchDate(launch_date_unix: Int!): [Launch]! #Should always return an array, but Launch may not exist, maybe if they grow enough they will have two launches on the same day 🤣
   noradId(norad_id: Int!): [Launch]! #Should always return an array, but Launch may not exist
+  readError: String
+  authenticationError: String
 }
