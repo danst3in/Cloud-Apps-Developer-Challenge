@@ -1,5 +1,23 @@
 # Cloud Application Engineer Challenge
 
+## A Note From Dan
+
+Hi!
+
+Please run `npm i` to install the original packages and those that I added during development.
+
+- To start the application please run `npm start`.
+  If it doesn't open for you automatically, you can visit the graphql pplayground at this address: `http://localhost:4000/graphql`
+- To start tests for the application please open a second terminal window and run `npm run test`
+
+You will notice that I have place the schema in a separate file: `schema.graphql`. I would generally place the resolvers in separate files i.e - `Query.js` (or `Mutation.js` / `Subscription.js`), but in this case there were only a few queries and I didn't want to possibly slow things down by importing what could theoretically be a much larger JSON file into multiple modules.
+
+There were some issues getting Jest to play nicely due to CORS connection issues. This took up a significant portion of my time, so I decided to hold off on adding extra queries or trying to get advanced logging to work.
+
+There is some scaffolding for setting up Winston for logging that I was hoping to try out based on a recommendation, but that will have to wait for another time.
+
+There are some notes in the test file, but if you receive connection errors please go to the testing terminal and press `a` to re-run all tests and it should succeed. If only I had realized that earlier 😭.
+
 ## Challenge
 
 Using your favorite language, implement a GraphQL server that would allow a UI developer to query SpaceX's launch data. The UI Developer will be most interested in querying the mission name, launch date, and the norad ids of the payloads on board the rocket. The focus of this assignment is assessing how you create a useful graphQL schema against the data and how understandable your code is.
