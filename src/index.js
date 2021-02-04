@@ -28,49 +28,8 @@ const spacex_launches_data = require("../data/spacex_launches.json");
 const typeDefs = gql`
   ${fs.readFileSync(__dirname.concat("/schema.graphql"), "utf8")}
 `;
-
-//* Resolvers define the technique for fetching the types defined in the schema.
-
-//* Resolvers were not moved to a separate file to avoid chances of trying to import any large json file multiple times.
-//* Resolver functions written as async for compatibility with live data sources.
-const resolvers = {
-  Query: {
-    launches: () => spacex_launches_data,
-    async missionName(parent, args, ctx, info) {
-      const launchesArr = spacex_launches_data.filter((launch) => {
-        return launch.mission_name === args.mission_name;
-      });
-      return launchesArr[0];
-    },
-    async launchDate(parent, args, ctx, info) {
-      const launchesArr = spacex_launches_data.filter((launch) => {
-        return launch.launch_date_unix === args.launch_date_unix;
-      });
-      return launchesArr;
-    },
-    async noradId(parent, args, ctx, info) {
-      const launchesArr = spacex_launches_data.filter((launch) => {
-        return launch.rocket.payloads.filter((payload) => {
-          payload.norad_id === args.norad_id;
-        });
-      });
-      return launchesArr;
-    },
-    readError: (parent, args, context) => {
-      fs.readFileSync("/does/not/exist");
-    },
-    authenticationError: (parent, args, context) => {
-      throw new AuthenticationError("must authenticate");
-    },
-  },
-  // DateTime: new GraphQLScalarType({
-  //   name: "DateTime",
-  //   description: "A date and time, represented as an ISO-8601 string",
-  //   serialize: (value) => value.toISOString(),
-  //   parseValue: (value) => new Date(value),
-  //   parseLiteral: (ast) => new Date(ast.value),
-  // }),
-};
+//* import GraphQL resolvers
+const resolvers = require("./Query");
 
 // * For Testing with graphql-tools ...
 // *
@@ -102,12 +61,18 @@ const resolvers = {
 
 const app = express();
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: (req) => ({
+    db: spacex_launches_data,
+  }),
+});
 server.applyMiddleware({ app });
 
 const PORT = 4000;
 
-// ? experimenting with Winston for logging
+//? experimenting with Winston for logging
 app.use(
   expressWinston.logger({
     transports: [new winston.transports.Console()],
