@@ -1,13 +1,26 @@
 const express = require("express");
+const path = require("path");
 const { ApolloServer, gql } = require("apollo-server-express");
 const { GraphQLScalarType } = require("graphql");
-const spacex_launches_data = require("./spacex_launches.json");
+const spacex_launches_data = require("../public/spacex_launches.json");
+
+/**
+ * //TODO:Build Schema types
+ * //TODO: Build types
+ * TODO: Build Query types
+ * //TODO: Build Mission Name Query types
+ * //TODO: Build Mission Name Query resolvers
+ * TODO: Build Launch Date Query types
+ * TODO: Build Launch Date Query resolvers
+ * TODO: Build Norad Id Query types
+ * TODO: Build Norad Id Query resolvers
+ */
 
 // This is the definition of the GraphQL schema
 // How you structure this schema to fit the spacex_launches_data below
 // along with how you write the code is the primary assessment
 const typeDefs = gql`
-  scalar DateTime
+  # scalar DateTime
 
   type Payload {
     payload_id: String!
@@ -16,7 +29,7 @@ const typeDefs = gql`
 
   type Rocket {
     rocket_id: String!
-    payloads: [Payload!]!
+    payloads: [Payload!]! #Provided data seems to indicate a Payload must exist for a Launch
   }
 
   type LaunchSite {
@@ -29,16 +42,17 @@ const typeDefs = gql`
     id: ID!
     flight_number: Int!
     mission_name: String!
-    launch_date_unix: DateTime!
+    launch_date_unix: Int!
+    # launch_date_unix: DateTime!
     rocket: Rocket
     launch_site: LaunchSite
     launch_success: Boolean
   }
 
-  # query: Query
-
   type Query {
-    launches: [Launch]!
+    launches: [Launch]! #Should always return an array, but Launch may not exist
+    missionName(mission_name: String!): Launch #Will return a Launch if it exists
+    launchDate(launch_date_unix: Int!): [Launch]! #Should always return an array, but Launch may not exist
   }
 `;
 
@@ -46,14 +60,26 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     launches: () => spacex_launches_data,
+    async missionName(parent, args, ctx, info) {
+      const launchesArr = spacex_launches_data.filter((launch) => {
+        return launch.mission_name === args.mission_name;
+      });
+      return launchesArr[0];
+    },
+    async launchDate(parent, args, ctx, info) {
+      const launchesArr = spacex_launches_data.filter((launch) => {
+        return launch.launch_date_unix === args.launch_date_unix;
+      });
+      return launchesArr;
+    },
   },
-  DateTime: new GraphQLScalarType({
-    name: "DateTime",
-    description: "A date and time, represented as an ISO-8601 string",
-    serialize: (value) => value.toISOString(),
-    parseValue: (value) => new Date(value),
-    parseLiteral: (ast) => new Date(ast.value),
-  }),
+  // DateTime: new GraphQLScalarType({
+  //   name: "DateTime",
+  //   description: "A date and time, represented as an ISO-8601 string",
+  //   serialize: (value) => value.toISOString(),
+  //   parseValue: (value) => new Date(value),
+  //   parseLiteral: (ast) => new Date(ast.value),
+  // }),
 };
 
 // create express server via middleware
@@ -62,6 +88,8 @@ const server = new ApolloServer({ typeDefs, resolvers });
 server.applyMiddleware({ app });
 
 const PORT = 4000;
+
+app.use("/static", express.static(path.join(__dirname, "public")));
 
 app.use((req, res) => {
   res.status(200);
