@@ -1,0 +1,39 @@
+#  This is the definition of the GraphQL schema
+#  How you structure this schema to fit the spacex_launches_data below
+#  along with how you write the code is the primary assessment
+
+# scalar DateTime
+
+type Payload {
+  payload_id: String!
+  norad_id: [Int]!
+}
+
+type Rocket {
+  rocket_id: String!
+  payloads: [Payload!]! #Provided data seems to indicate a Payload must exist for a Launch
+}
+
+type LaunchSite {
+  site_id: String!
+  site_name: String!
+  site_name_long: String!
+}
+
+type Launch {
+  id: ID!
+  flight_number: Int!
+  mission_name: String!
+  launch_date_unix: Int!
+  # launch_date_unix: DateTime!
+  rocket: Rocket
+  launch_site: LaunchSite
+  launch_success: Boolean
+}
+
+type Query {
+  launches: [Launch]! #Should always return an array, but Launch may not exist
+  missionName(mission_name: String!): Launch #Will return a Launch if it exists
+  launchDate(launch_date_unix: Int!): [Launch]! #Should always return an array, but Launch may not exist, maybe if they grow enough they will have two launches on the same day 🤣
+  noradId(norad_id: Int!): [Launch]! #Should always return an array, but Launch may not exist
+}
