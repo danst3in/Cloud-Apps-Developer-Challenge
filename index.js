@@ -2,18 +2,18 @@ const express = require("express");
 const path = require("path");
 const { ApolloServer, gql } = require("apollo-server-express");
 const { GraphQLScalarType } = require("graphql");
-const spacex_launches_data = require("../public/spacex_launches.json");
+const spacex_launches_data = require("./public/spacex_launches.json");
 
 /**
  * //TODO:Build Schema types
  * //TODO: Build types
- * TODO: Build Query types
+ * //TODO: Build Query types
  * //TODO: Build Mission Name Query types
  * //TODO: Build Mission Name Query resolvers
- * TODO: Build Launch Date Query types
- * TODO: Build Launch Date Query resolvers
- * TODO: Build Norad Id Query types
- * TODO: Build Norad Id Query resolvers
+ * //TODO: Build Launch Date Query types
+ * //TODO: Build Launch Date Query resolvers
+ * //TODO: Build Norad Id Query types
+ * //TODO: Build Norad Id Query resolvers
  */
 
 // This is the definition of the GraphQL schema
@@ -52,7 +52,8 @@ const typeDefs = gql`
   type Query {
     launches: [Launch]! #Should always return an array, but Launch may not exist
     missionName(mission_name: String!): Launch #Will return a Launch if it exists
-    launchDate(launch_date_unix: Int!): [Launch]! #Should always return an array, but Launch may not exist
+    launchDate(launch_date_unix: Int!): [Launch]! #Should always return an array, but Launch may not exist, maybe if they grow enough they will have two launches on the same day 🤣
+    noradId(norad_id: Int!): [Launch]! #Should always return an array, but Launch may not exist
   }
 `;
 
@@ -69,6 +70,14 @@ const resolvers = {
     async launchDate(parent, args, ctx, info) {
       const launchesArr = spacex_launches_data.filter((launch) => {
         return launch.launch_date_unix === args.launch_date_unix;
+      });
+      return launchesArr;
+    },
+    async noradId(parent, args, ctx, info) {
+      const launchesArr = spacex_launches_data.filter((launch) => {
+        return launch.rocket.payloads.filter((payload) => {
+          payload.norad_id === args.norad_id;
+        });
       });
       return launchesArr;
     },
