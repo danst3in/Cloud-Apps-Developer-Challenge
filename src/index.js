@@ -1,5 +1,4 @@
 const express = require("express");
-
 const fs = require("fs");
 const {
   ApolloServer,
@@ -7,10 +6,10 @@ const {
   addMockFunctionsToSchema,
   makeExecutableSchema,
 } = require("apollo-server-express");
-// const { GraphQLScalarType } = require("graphql");
-const spacex_launches_data = require("./data/spacex_launches.json");
 const winston = require("winston");
 const expressWinston = require("express-winston");
+// const { GraphQLScalarType } = require("graphql");
+const spacex_launches_data = require("../data/spacex_launches.json");
 
 /**
  * //TODO:Build Schema types
@@ -22,8 +21,10 @@ const expressWinston = require("express-winston");
  * //TODO: Build Launch Date Query resolvers
  * //TODO: Build Norad Id Query types
  * //TODO: Build Norad Id Query resolvers
+ * //TODO: Add tests for resolvers
  */
 
+//* import GraphQL schema
 const typeDefs = gql`
   ${fs.readFileSync(__dirname.concat("/schema.graphql"), "utf8")}
 `;
@@ -71,8 +72,8 @@ const resolvers = {
   // }),
 };
 
+// * For Testing with graphql-tools ...
 // *
-// * For Testing with graphql-tools
 // const executableSchema = makeExecutableSchema({
 //   typeDefs,
 //   resolvers,
@@ -98,6 +99,7 @@ const resolvers = {
 // *
 // *
 // * create express server via middleware
+
 const app = express();
 
 const server = new ApolloServer({ typeDefs, resolvers });

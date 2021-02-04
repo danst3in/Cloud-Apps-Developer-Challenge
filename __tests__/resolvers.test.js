@@ -1,9 +1,9 @@
 const fetch = require("node-fetch");
 
 // !If receiving CORS connection errors just keep repeating the test
-// !The connection succeeds sporadically ¯\_(ツ)_/¯
 // !Try running the test, if you receive a connection error, go to the terminal and
 // !then press 'a' to run all tests. Seems to work 🙃
+// !The connection succeeds sporadically ¯\_(ツ)_/¯
 describe("json resolvers", () => {
   it("returns the expected data for simple all launches query", async () => {
     try {
